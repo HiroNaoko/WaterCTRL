@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "223422566951",
+    "project_id": "waterctrl-8ab94",
+    "storage_bucket": "waterctrl-8ab94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223422566951:android:81819ef517f52ceb5bf402",
+        "android_client_info": {
+          "package_name": "dev.inacap.waterctrl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmYTPNDZTEMHtQYEQCAUDNdjTxw61Re-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F4F6F9">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Planta Virtual: Gemelo Digital"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#0D47A1" />
+
+        <TextView
+            android:id="@+id/tvEstadoBTActivador"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado BT: Escuchando conexiones..."
+            android:textSize="14sp"
+            android:textColor="#546E7A"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Tarjeta 1: Sensor HC-SR04 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#CFD8DC"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sensor Ultrasónico HC-SR04"
+                        android:textStyle="bold"
+                        android:textSize="17sp"
+                        android:textColor="#263238" />
+
+                    <TextView
+                        android:id="@+id/tvDistanciaSlider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="28.0 cm"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#0277BD" />
+                </LinearLayout>
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderDistancia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0.0"
+                    android:valueTo="60.0"
+                    android:value="28.0"
+                    android:stepSize="0.5"
+                    android:layout_marginTop="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="0 cm (Lleno)"
+                        android:textSize="13sp"
+                        android:textColor="#78909C" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="60 cm (Vacío)"
+                        android:textSize="13sp"
+                        android:textColor="#78909C" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tarjeta 2: Nivel y Volumen -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#CFD8DC"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Columna de Agua Útil"
+                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    android:textColor="#263238" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressNivelAgua"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:progress="53"
+                    app:indicatorColor="#0288D1"
+                    app:trackColor="#E1F5FE"
+                    app:trackThickness="16dp"
+                    app:trackCornerRadius="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:id="@+id/tvPorcentajePlanta"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Volumen: 53.3 %"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#37474F" />
+
+                    <TextView
+                        android:id="@+id/tvAlertaNivelPlanta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CRÍTICO (> 25 cm)"
+                        android:textColor="#D32F2F"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tarjeta 3: Relé Bomba (Con SwitchCompat compatible) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#CFD8DC"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Actuador de Potencia"
+                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    android:textColor="#263238" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchReleBomba"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Motobomba de Llenado"
+                    android:textSize="16sp"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:id="@+id/tvProteccionMotor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Protección anti-cavitación: Activa"
+                    android:textSize="13sp"
+                    android:textColor="#546E7A"
+                    android:layout_marginTop="6dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tarjeta 4: Consola Serial -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#263238">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monitor Serial RFCOMM (SPP)"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="#80CBC4" />
+
+                <TextView
+                    android:id="@+id/tvLogSerial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TX >> {dist: 28.0, pump: false, mode: AUTO}\nRX &lt;&lt; ESPERANDO ENLACE SCADA..."
+                    android:fontFamily="monospace"
+                    android:textSize="12sp"
+                    android:textColor="#ECEFF1"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>
