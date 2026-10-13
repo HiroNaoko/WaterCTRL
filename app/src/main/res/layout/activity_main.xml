@@ -35,13 +35,18 @@
         android:layout_height="wrap_content"
         android:hint="Usuario"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxStrokeColor="#0D47A1"
+        app:hintTextColor="#0D47A1"
+        android:textColorHint="#546E7A"
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etUsuario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textColor="#1E293B"
+            android:textColorHint="#546E7A" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Campo Contraseña -->
@@ -50,15 +55,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Contraseña"
-        app:passwordToggleEnabled="true"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxStrokeColor="#0D47A1"
+        app:hintTextColor="#0D47A1"
+        android:textColorHint="#546E7A"
+        app:endIconMode="password_toggle"
+        app:endIconTint="#0D47A1"
         android:layout_marginBottom="24dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etClave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="#1E293B"
+            android:textColorHint="#546E7A" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Botón de Inicio de Sesión -->
@@ -68,6 +79,8 @@
         android:layout_height="56dp"
         android:text="INICIAR SESIÓN"
         android:textSize="15sp"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#0D47A1"
         app:cornerRadius="8dp"
         android:layout_marginBottom="24dp" />
 
@@ -77,8 +90,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Perfiles de Acceso (RBAC):\n• empresa / empresa123 (Consola SCADA y E-Stop)\n• personal / personal123 (Solo lectura telemétrica)"
-        android:textSize="12sp"
-        android:textColor="#78909C"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textColor="#546E7A"
+        android:textSize="12sp" />
 
 </LinearLayout>
