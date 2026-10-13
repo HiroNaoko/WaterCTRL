@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -12,13 +13,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "waterctrl_local.db"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3 // Subimos a 3 para regenerar con contraseñas hasheadas
 
         // Tabla Usuarios
         const val TABLA_USUARIOS = "usuarios"
         const val COL_USUARIO_ID = "id"
         const val COL_USUARIO_NOMBRE = "usuario"
-        const val COL_USUARIO_PASS = "password"
+        const val COL_USUARIO_PASS = "password_hash" // Almacena el resumen criptográfico
         const val COL_USUARIO_ROL = "rol"
 
         // Tabla Bitácora / Telemetría
@@ -29,6 +30,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COL_BITACORA_BOMBA = "bomba_activa"
         const val COL_BITACORA_EVENTO = "evento"
         const val COL_BITACORA_USUARIO = "usuario_responsable"
+
+        // Función de Hashing SHA-256 (Nativa de Java/Android)
+        fun hashSha256(input: String): String {
+            val bytes = MessageDigest.getInstance("SHA-256").digest(input.toByteArray())
+            return bytes.joinToString("") { "%02x".format(it) }
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -54,9 +61,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         """.trimIndent()
         db.execSQL(crearTablaBitacora)
 
-        //DEMO
-        insertarUsuarioInicial(db, "empresa", "empresa123", "EMPRESA")
-        insertarUsuarioInicial(db, "personal", "personal123", "PERSONAL")
+        // Se insertan únicamente los hashes criptográficos (Cumplimiento ISO 27400)
+        insertarUsuarioInicial(db, "empresa", hashSha256("empresa123"), "EMPRESA")
+        insertarUsuarioInicial(db, "personal", hashSha256("personal123"), "PERSONAL")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -65,21 +72,25 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
 
-    private fun insertarUsuarioInicial(db: SQLiteDatabase, user: String, pass: String, rol: String) {
+    private fun insertarUsuarioInicial(db: SQLiteDatabase, user: String, passHash: String, rol: String) {
         val valores = ContentValues().apply {
             put(COL_USUARIO_NOMBRE, user)
-            put(COL_USUARIO_PASS, pass)
+            put(COL_USUARIO_PASS, passHash)
             put(COL_USUARIO_ROL, rol)
         }
         db.insert(TABLA_USUARIOS, null, valores)
     }
-    fun validarCredenciales(usuario: String, clave: String): String? {
+
+    fun validarCredenciales(usuario: String, claveTextoPlano: String): String? {
         val db = readableDatabase
+        // Hasheamos lo ingresado antes de consultar
+        val claveHash = hashSha256(claveTextoPlano)
+
         val cursor = db.query(
             TABLA_USUARIOS,
             arrayOf(COL_USUARIO_ROL),
             "$COL_USUARIO_NOMBRE = ? AND $COL_USUARIO_PASS = ?",
-            arrayOf(usuario, clave),
+            arrayOf(usuario, claveHash),
             null, null, null
         )
 
