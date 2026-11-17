@@ -8,103 +8,171 @@ import android.bluetooth.BluetoothSocket
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 import java.util.UUID
 
 object BluetoothManagerHelper {
 
-    // UUID estándar SPP (Serial Port Profile) compatible con Android, HC-05 y ESP32
     val SPP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     private const val APP_NAME = "WaterCTRL_OT"
 
-    private var socketActivo: BluetoothSocket? = null
-    private var outputStream: OutputStream? = null
-    private var inputStream: InputStream? = null
-    private var serverSocket: BluetoothServerSocket? = null
+    @Volatile private var socketActivo: BluetoothSocket? = null
+    @Volatile private var outputStream: OutputStream? = null
+    @Volatile private var inputStream: InputStream? = null
+    @Volatile private var serverSocket: BluetoothServerSocket? = null
+
+    @Volatile private var ultimoDispositivoCliente: BluetoothDevice? = null
+    @Volatile private var reconexionAutomaticaActiva = false
+    @Volatile private var reconectandoActualmente = false
 
     var alRecibirMensaje: ((String) -> Unit)? = null
     var alCambiarEstado: ((String) -> Unit)? = null
 
-    // Servidor: Escucha conexiones entrantes (se usa en Nodo Planta)
     @SuppressLint("MissingPermission")
     fun iniciarServidor(adapter: BluetoothAdapter) {
         cerrarConexion()
         Thread {
             try {
                 alCambiarEstado?.invoke("Esperando conexión de Consola SCADA...")
-                serverSocket = adapter.listenUsingRfcommWithServiceRecord(APP_NAME, SPP_UUID)
-                val socket = serverSocket?.accept()
-                serverSocket?.close() // Ya aceptó un cliente
-
-                if (socket != null) {
-                    gestionarSocketConectado(socket)
-                }
+                val servidor = adapter.listenUsingRfcommWithServiceRecord(APP_NAME, SPP_UUID)
+                serverSocket = servidor
+                val socket = servidor.accept()
+                servidor.close()
+                serverSocket = null
+                gestionarSocketConectado(socket)
             } catch (e: IOException) {
                 alCambiarEstado?.invoke("Servidor detenido: ${e.message}")
             }
         }.start()
     }
 
-    // Cliente: Se conecta a un dispositivo emparejado (se usa en Consola SCADA)
     @SuppressLint("MissingPermission")
     fun conectarComoCliente(device: BluetoothDevice) {
         cerrarConexion()
+        ultimoDispositivoCliente = device
+        reconexionAutomaticaActiva = true
+        intentarConexionCliente(device)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun intentarConexionCliente(device: BluetoothDevice) {
         Thread {
+            var socket: BluetoothSocket? = null
             try {
-                alCambiarEstado?.invoke("Conectando a ${device.name}...")
-                val socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+                alCambiarEstado?.invoke("Conectando a ${device.name ?: device.address}...")
+                socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
                 socket.connect()
+                reconectandoActualmente = false
                 gestionarSocketConectado(socket)
             } catch (e: IOException) {
+                try { socket?.close() } catch (_: IOException) {}
                 alCambiarEstado?.invoke("Fallo de conexión: ${e.message}")
-                cerrarConexion()
+                programarReconexion()
+            }
+        }.start()
+    }
+
+    private fun programarReconexion() {
+        val dispositivo = ultimoDispositivoCliente ?: return
+        if (!reconexionAutomaticaActiva || reconectandoActualmente) return
+
+        reconectandoActualmente = true
+        Thread {
+            try {
+                alCambiarEstado?.invoke("Reconectando automáticamente en 4s...")
+                Thread.sleep(4000)
+                reconectandoActualmente = false
+                if (reconexionAutomaticaActiva && socketActivo == null) {
+                    intentarConexionCliente(dispositivo)
+                }
+            } catch (_: InterruptedException) {
+                reconectandoActualmente = false
             }
         }.start()
     }
 
     private fun gestionarSocketConectado(socket: BluetoothSocket) {
-        socketActivo = socket
-        outputStream = socket.outputStream
-        inputStream = socket.inputStream
-        alCambiarEstado?.invoke("ENLACE ACTIVO")
+        try {
+            socketActivo = socket
+            outputStream = socket.outputStream
+            inputStream = socket.inputStream
+            alCambiarEstado?.invoke("ENLACE ACTIVO")
 
-        // Hilo de lectura continua
-        Thread {
-            val buffer = ByteArray(1024)
-            while (socketActivo?.isConnected == true) {
+            Thread {
+                val buffer = ByteArray(1024)
+                val mensajeAcumulado = StringBuilder()
                 try {
-                    val bytes = inputStream?.read(buffer) ?: -1
-                    if (bytes > 0) {
-                        val mensaje = String(buffer, 0, bytes).trim()
-                        alRecibirMensaje?.invoke(mensaje)
+                    while (socketActivo === socket && socket.isConnected) {
+                        val bytes = inputStream?.read(buffer) ?: -1
+                        if (bytes == -1) break
+                        if (bytes > 0) {
+                            val fragmento = String(buffer, 0, bytes, StandardCharsets.UTF_8)
+                            mensajeAcumulado.append(fragmento)
+
+                            var posicion = mensajeAcumulado.indexOf("\n")
+                            while (posicion != -1) {
+                                val mensaje = mensajeAcumulado.substring(0, posicion).trim()
+                                mensajeAcumulado.delete(0, posicion + 1)
+                                if (mensaje.isNotEmpty()) {
+                                    alRecibirMensaje?.invoke(mensaje)
+                                }
+                                posicion = mensajeAcumulado.indexOf("\n")
+                            }
+                        }
                     }
-                } catch (e: IOException) {
-                    alCambiarEstado?.invoke("Conexión perdida")
-                    break
+                } catch (_: IOException) {
+                } finally {
+                    desconectarSocket(socket)
                 }
-            }
-        }.start()
+            }.start()
+        } catch (e: IOException) {
+            alCambiarEstado?.invoke("Error al configurar Bluetooth: ${e.message}")
+            desconectarSocket(socket)
+        }
     }
 
-    // Envío de tramas de telemetría o mandos
     fun enviarDatos(trama: String): Boolean {
         return try {
-            outputStream?.write((trama + "\n").toByteArray())
-            outputStream?.flush()
+            val salida = outputStream ?: return false
+            synchronized(salida) {
+                val mensaje = trama.trimEnd('\r', '\n') + "\n"
+                salida.write(mensaje.toByteArray(StandardCharsets.UTF_8))
+                salida.flush()
+            }
             true
         } catch (e: IOException) {
+            alCambiarEstado?.invoke("Error al enviar datos: ${e.message}")
             false
         }
     }
 
+    private fun desconectarSocket(socket: BluetoothSocket) {
+        if (socketActivo === socket) {
+            socketActivo = null
+            inputStream = null
+            outputStream = null
+            try { socket.close() } catch (_: IOException) {}
+            alCambiarEstado?.invoke("Conexión perdida")
+            programarReconexion()
+        }
+    }
+
     fun cerrarConexion() {
-        try {
-            inputStream?.close()
-            outputStream?.close()
-            socketActivo?.close()
-            serverSocket?.close()
-        } catch (_: IOException) {}
+        reconexionAutomaticaActiva = false
+        reconectandoActualmente = false
+        val socket = socketActivo
+        val entrada = inputStream
+        val salida = outputStream
+        val servidor = serverSocket
+
         socketActivo = null
-        outputStream = null
         inputStream = null
+        outputStream = null
+        serverSocket = null
+
+        try { entrada?.close() } catch (_: IOException) {}
+        try { salida?.close() } catch (_: IOException) {}
+        try { socket?.close() } catch (_: IOException) {}
+        try { servidor?.close() } catch (_: IOException) {}
     }
 }

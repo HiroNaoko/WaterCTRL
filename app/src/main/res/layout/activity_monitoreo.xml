@@ -3,190 +3,260 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F9"
+    android:background="#F1F5F9"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
-        <!-- Encabezado SCADA -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consola SCADA: Monitoreo OT"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#0D47A1" />
+            android:text="@string/scada_titulo"
+            android:textColor="#0F172A"
+            android:textSize="21sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvEstadoEnlaceBT"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enlace BT: Conectando..."
-            android:textSize="14sp"
-            android:textColor="#D32F2F"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginTop="4dp"
+            android:text="@string/scada_estado_bt"
+            android:textColor="#475569"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <!-- Tarjeta 1: Telemetría en Vivo -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="14dp"
             app:cardElevation="2dp"
-            app:strokeColor="#CFD8DC"
-            app:strokeWidth="1dp"
-            android:layout_marginBottom="16dp">
+            app:strokeColor="#CBD5E1"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Telemetría en Vivo"
-                    android:textStyle="bold"
-                    android:textSize="17sp"
-                    android:textColor="#263238" />
+                    android:text="@string/scada_telemetria"
+                    android:textColor="#0F172A"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="10dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Distancia HC-SR04:"
-                        android:textSize="16sp"
-                        android:textColor="#455A64" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tvDistanciaSCADA"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0.0 cm"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#0277BD" />
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/scada_distancia"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
+                        <TextView
+                            android:id="@+id/tvDistanciaSCADA"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/scada_distancia_inicial"
+                            android:textColor="#0284C7"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Llenado Estanque:"
-                        android:textSize="16sp"
-                        android:textColor="#455A64" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tvPorcentajeSCADA"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0.0 %"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#0277BD" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/scada_llenado"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvPorcentajeSCADA"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/scada_porcentaje_inicial"
+                            android:textColor="#0F172A"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvSemaforoAlerta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ESTADO: SEGURO"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="#2E7D32"
+                    android:layout_marginTop="12dp"
                     android:background="#E8F5E9"
+                    android:gravity="center"
                     android:padding="10dp"
-                    android:layout_marginTop="16dp" />
+                    android:text="@string/scada_estado_seguro"
+                    android:textColor="#2E7D32"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Tarjeta 2: Mandos OT -->
+        <!-- Tarjeta 2: Consignas de Operación -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardControlesOT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="14dp"
             app:cardElevation="2dp"
-            app:strokeColor="#CFD8DC"
-            app:strokeWidth="1dp"
-            android:layout_marginBottom="16dp">
+            app:strokeColor="#CBD5E1"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Consignas de Operación (OT)"
-                    android:textStyle="bold"
-                    android:textSize="17sp"
-                    android:textColor="#263238" />
+                    android:text="@string/scada_consignas"
+                    android:textColor="#0F172A"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/rgModosSCADA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="8dp">
 
                     <RadioButton
                         android:id="@+id/rbAuto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Automático (Corte por nivel en 25 cm)"
-                        android:textSize="15sp"
-                        android:checked="true" />
+                        android:checked="true"
+                        android:text="@string/scada_modo_automatico"
+                        android:textColor="#0F172A" />
 
                     <RadioButton
                         android:id="@+id/rbManual"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Manual (Habilita mando de bomba)"
-                        android:textSize="15sp" />
+                        android:text="@string/scada_modo_manual"
+                        android:textColor="#0F172A" />
                 </RadioGroup>
 
-                <!-- SwitchCompat universal sin incompatibilidades -->
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchMandoManual"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mando Manual de Bomba"
-                    android:textSize="16sp"
+                    android:layout_marginTop="4dp"
                     android:enabled="false"
-                    android:layout_marginTop="12dp" />
+                    android:text="@string/scada_mando_manual"
+                    android:textColor="#0F172A"
+                    android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Paro de Emergencia E-Stop -->
+        <!-- Tarjeta 3: Eficiencia Energética (Opción A) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#CBD5E1"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scada_energia_titulo"
+                    android:textColor="#0F172A"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchModoEco"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/scada_switch_eco"
+                    android:textColor="#0F172A"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvFrecuenciaTelemetria"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scada_energia_telemetria_normal"
+                    android:textColor="#0369A1"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvMetricasEnergia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="#F8FAFC"
+                    android:padding="8dp"
+                    android:text="@string/scada_energia_consumo_inicial"
+                    android:textColor="#334155"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Botones de Acción -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnParoEmergencia"
             android:layout_width="match_parent"
-            android:layout_height="62dp"
-            android:text="PARO DE EMERGENCIA (E-STOP)"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            app:cornerRadius="12dp"
-            app:backgroundTint="#D32F2F"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/scada_paro_emergencia"
+            app:backgroundTint="#DC2626"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAbrirHistorial"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/historial_abrir"
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
 </ScrollView>

@@ -1,3 +1,108 @@
 <resources>
     <string name="app_name">WaterCTRL</string>
+
+    <!-- MonitoreoActivity -->
+    <string name="porcentaje_inicial" formatted="false">0.0 %</string>
+    <string name="distancia_inicial">--.- cm</string>
+    <string name="estado_bt_desconectado">Enlace BT: Desconectado</string>
+    <string name="estado_bt_formato">Enlace BT: %1$s</string>
+
+    <!-- Login (activity_main.xml) -->
+    <string name="login_subtitulo">Sistema de Monitoreo y Control de Estanques</string>
+    <string name="login_titulo">Inicio de sesión</string>
+    <string name="login_instrucciones">Ingresa tus credenciales para acceder al sistema.</string>
+    <string name="hint_usuario">Usuario</string>
+    <string name="hint_contrasena">Contraseña</string>
+    <string name="btn_iniciar_sesion">INICIAR SESIÓN</string>
+    <string name="rbac_titulo">Perfiles de acceso (RBAC)</string>
+    <string name="rbac_descripcion">EMPRESA: administración, configuración y gestión de usuarios.\n\nPERSONAL: monitoreo y operación de la planta.</string>
+    <string name="login_footer">WaterCTRL | Sistema de control OT</string>
+
+    <!-- Activador (activity_activador.xml) -->
+    <string name="activador_titulo">Planta Virtual: Gemelo Digital</string>
+    <string name="activador_estado_bt_inicial">Estado BT: Escuchando conexiones…</string>
+    <string name="activador_sensor_titulo">Sensor Ultrasónico HC-SR04</string>
+    <string name="activador_distancia_inicial">28.0 cm</string>
+    <string name="activador_slider_min">0 cm (Lleno)</string>
+    <string name="activador_slider_max">60 cm (Vacío)</string>
+    <string name="activador_columna_titulo">Columna de Agua Útil</string>
+    <string name="activador_volumen_inicial" formatted="false">Volumen: 53.3 %</string>
+    <string name="activador_alerta_inicial">CRÍTICO (&gt; 25 cm)</string>
+    <string name="activador_actuador_titulo">Actuador de Potencia</string>
+    <string name="activador_switch_bomba">Motobomba de Llenado</string>
+    <string name="activador_proteccion_motor">Protección anti-cavitación: Activa</string>
+    <string name="activador_consola_titulo">Monitor Serial RFCOMM (SPP)</string>
+    <string name="activador_log_inicial">TX &gt;&gt; {dist: 28.0, pump: false, mode: AUTO}\nRX &lt;&lt; ESPERANDO ENLACE SCADA…</string>
+
+    <!-- Historial -->
+    <string name="historial_volver">VOLVER</string>
+    <string name="historial_titulo">Historial de actividad</string>
+    <string name="historial_subtitulo">Registro de operaciones y eventos de WaterCTRL</string>
+    <string name="historial_cargando">Cargando historial…</string>
+    <string name="historial_filtro_titulo">Filtrar por tipo de evento</string>
+
+    <string name="historial_filtro_todos">Todos los eventos</string>
+    <string name="historial_filtro_sesiones">Sesiones</string>
+    <string name="historial_filtro_bomba">Motobomba</string>
+    <string name="historial_filtro_emergencias">Emergencias</string>
+    <string name="historial_filtro_otros">Otros eventos</string>
+    <string name="historial_filtro_alertas">Alertas</string>
+
+    <string name="historial_registros" formatted="false">%1$d registros</string>
+    <string name="historial_registros_inicial">0 registros</string>
+    <string name="historial_actualizar">ACTUALIZAR</string>
+    <string name="historial_vacio">No hay registros para mostrar con este filtro.</string>
+
+    <string name="historial_usuario">Usuario: %1$s</string>
+    <string name="historial_distancia">Distancia: %1$s</string>
+    <string name="historial_bomba">Motobomba: %1$s</string>
+    <string name="historial_sesion">Sesión: %1$s</string>
+
+    <string name="historial_sin_usuario">No identificado</string>
+    <string name="historial_sin_sesion">Sin sesión asociada</string>
+    <string name="historial_bomba_encendida">Encendida</string>
+    <string name="historial_bomba_apagada">Apagada</string>
+    <string name="historial_rango_eventos">Últimos 14 eventos</string>
+    <string name="historial_rango_hora">Por hora</string>
+    <string name="historial_rango_dia">Por día</string>
+    <string name="historial_filtro_sesiones_corto">Sesiones</string>
+
+
+    <!-- Pantalla SCADA -->
+    <string name="scada_titulo">Consola SCADA: Monitoreo OT</string>
+    <string name="scada_estado_bt">Enlace BT: Conectando…</string>
+    <string name="scada_telemetria">Telemetría en Vivo</string>
+    <string name="scada_distancia">Distancia HC-SR04:</string>
+    <string name="scada_distancia_inicial">0.0 cm</string>
+    <string name="scada_llenado">Llenado Estanque:</string>
+    <string name="scada_porcentaje_inicial">0.0 %</string>
+    <string name="scada_estado_seguro">ESTADO: SEGURO</string>
+    <string name="scada_consignas">Consignas de Operación (OT)</string>
+    <string name="scada_modo_automatico">Automático (Corte por nivel en 25 cm)</string>
+    <string name="scada_modo_manual">Manual (Habilita mando de bomba)</string>
+    <string name="scada_mando_manual">Mando Manual de Bomba</string>
+    <string name="scada_paro_emergencia">PARO DE EMERGENCIA (E-STOP)</string>
+    <string name="historial_abrir">VER HISTORIAL DE ACTIVIDAD</string>
+
+    <string name="scada_estado_estop">PARO DE EMERGENCIA ACTIVO</string>
+    <string name="scada_estado_falla_sensor">FALLA DE SENSOR HC-SR04</string>
+    <string name="scada_estado_critico">NIVEL CRÍTICO (> 25 cm) - LLENANDO</string>
+    <string name="historial_operador_sesion">%1$s · Ses #%2$d</string>
+    <string name="scada_estado_lleno">ESTANQUE LLENO (\u003c 8 cm) - DETENIDO</string>
+    <string name="historial_grafico_titulo">TENDENCIA DE NIVEL DE AGUA (ÚLTIMOS 12 EVENTOS)</string>
+    <!-- Eficiencia Energética SCADA -->
+    <string name="scada_energia_titulo">Eficiencia Energética (IoT + Actuador)</string>
+    <string name="scada_switch_eco">Modo Ahorro Energético (ECO - 2500 ms)</string>
+    <string name="scada_energia_telemetria_normal">Muestreo: Normal (500 ms · 2.0 Hz)</string>
+    <string name="scada_energia_telemetria_eco">Muestreo: ECO (2500 ms · 0.4 Hz · -80%% TX)</string>
+    <string name="scada_energia_consumo_inicial">Bomba: 0.00 Wh  |  Ahorro IoT: 0.00 mWh</string>
+    <string name="scada_energia_consumo_formato">Bomba: %1$.2f Wh  |  Ahorro IoT: %2$.2f mWh</string>
+
+    <!-- Historial Avanzado -->
+    <string name="historial_exportar">EXPORTAR CSV</string>
+    <string name="historial_hoy">HOY</string>
+    <string name="historial_ayer">AYER</string>
+    <string name="historial_kpi_uso_bomba">Uso Bomba</string>
+    <string name="historial_detalle_tecnico">ID Local: #%1$d  •  Sync: %2$s  •  Integridad: HMAC-SHA256 OK</string>
+
 </resources>

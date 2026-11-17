@@ -1,36 +1,58 @@
 package dev.inacap.waterctrl
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import dev.inacap.waterctrl.databinding.ActivityActivadorBinding
+import org.json.JSONObject
+import java.util.Locale
 
 @SuppressLint("SetTextI18n")
 class ActivadorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityActivadorBinding
+    private lateinit var dbHelper: DatabaseHelper
     private var bluetoothAdapter: BluetoothAdapter? = null
+
     private var rolUsuario = "PERSONAL"
+    private var usuarioActual = ""
+    private var sesionId = -1L
+    private var ultimaBombaRegistrada: Boolean? = null
+
+    private var secuenciaTelemetria = 1L
+    private var modoActual = "AUTO"
+    private var paroEmergenciaActivo = false
+
+    private val permisoBluetoothLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
+            if (concedido) iniciarServidorBluetooth()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityActivadorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        dbHelper = DatabaseHelper(this)
         rolUsuario = intent.getStringExtra("ROL_USUARIO") ?: "PERSONAL"
+        usuarioActual = intent.getStringExtra("USUARIO") ?: ""
+        sesionId = intent.getLongExtra("SESION_ID", -1L)
 
         val manager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = manager.adapter
 
         aplicarSeguridadNodoPlanta()
-        iniciarServidorBluetooth()
+        verificarPermisoYArrancarServidor()
 
-        // Enviar trama al mover el slider de nivel
         binding.sliderDistancia.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 actualizarTelemetriaPlanta(value)
@@ -38,13 +60,21 @@ class ActivadorActivity : AppCompatActivity() {
             }
         }
 
-        // Enviar trama al cambiar el interruptor de la motobomba
         binding.switchReleBomba.setOnCheckedChangeListener { _, isChecked ->
             if (binding.switchReleBomba.isPressed) {
                 transmitirEstado(binding.sliderDistancia.value, isChecked)
             }
-            actualizarConsolaSerial(binding.sliderDistancia.value, isChecked)
         }
+    }
+
+    private fun verificarPermisoYArrancarServidor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                permisoBluetoothLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                return
+            }
+        }
+        iniciarServidorBluetooth()
     }
 
     private fun iniciarServidorBluetooth() {
@@ -54,20 +84,37 @@ class ActivadorActivity : AppCompatActivity() {
             return
         }
 
-        // Callback de mensajes entrantes desde la Consola SCADA (ej: Paro de emergencia)
-        BluetoothManagerHelper.alRecibirMensaje = { trama ->
+        BluetoothManagerHelper.alRecibirMensaje = { tramaCruda ->
+            val jsonValido = SecurityHelper.verificarYExtraer(tramaCruda)
+            val msg = jsonValido?.let { MessageParser.parse(it) }
             runOnUiThread {
-                if (trama.contains("ESTOP")) {
-                    binding.switchReleBomba.isChecked = false
-                    actualizarTelemetriaPlanta(binding.sliderDistancia.value)
-                    Toast.makeText(this, "¡PARO DE EMERGENCIA RECIBIDO POR BT!", Toast.LENGTH_SHORT).show()
+                if (msg is WaterCtrlMessage.Command) {
+                    when (msg.command) {
+                        "ESTOP" -> {
+                            paroEmergenciaActivo = true
+                            binding.switchReleBomba.isChecked = false
+                            registrarEventoLocal("PARO_EMERGENCIA_RECIBIDO")
+                            transmitirEstado(binding.sliderDistancia.value, false)
+                        }
+                        "SET_MODE" -> {
+                            modoActual = msg.value ?: "AUTO"
+                            transmitirEstado(binding.sliderDistancia.value, binding.switchReleBomba.isChecked)
+                        }
+                        "SET_PUMP" -> {
+                            if (modoActual == "MANUAL" && !paroEmergenciaActivo) {
+                                val encender = msg.value == "ON"
+                                binding.switchReleBomba.isChecked = encender
+                                transmitirEstado(binding.sliderDistancia.value, encender)
+                            }
+                        }
+                    }
                 }
             }
         }
 
         BluetoothManagerHelper.alCambiarEstado = { estado ->
             runOnUiThread {
-                binding.tvLogSerial.text = "BT: $estado"
+                binding.tvEstadoBTActivador.text = "Estado BT: $estado"
             }
         }
 
@@ -75,28 +122,41 @@ class ActivadorActivity : AppCompatActivity() {
     }
 
     private fun transmitirEstado(distancia: Float, bomba: Boolean) {
-        val trama = "{\"dist\":%.1f,\"pump\":%b,\"user\":\"%s\"}".format(distancia, bomba, rolUsuario)
-        BluetoothManagerHelper.enviarDatos(trama)
-        actualizarConsolaSerial(distancia, bomba)
-    }
+        val porcentaje = ((60.0f - distancia) / 60.0f * 100.0f).coerceIn(0.0f, 100.0f)
+        val json = JSONObject()
+            .put("v", 1)
+            .put("type", "TEL")
+            .put("seq", secuenciaTelemetria++)
+            .put("distance_cm", String.format(Locale.US, "%.1f", distancia).toDouble())
+            .put("level_pct", String.format(Locale.US, "%.1f", porcentaje).toDouble())
+            .put("pump_on", bomba)
+            .put("mode", modoActual)
+            .put("sensor_ok", true)
+            .put("estop", paroEmergenciaActivo)
 
-    private fun aplicarSeguridadNodoPlanta() {
-        if (rolUsuario == "PERSONAL") {
-            binding.switchReleBomba.isEnabled = false
-            binding.tvProteccionMotor.text = "Acceso Restringido: Sin privilegios de maniobra (Rol: PERSONAL)"
-            binding.tvProteccionMotor.setTextColor("#C62828".toColorInt())
-        } else {
-            binding.switchReleBomba.isEnabled = true
-            binding.tvProteccionMotor.text = "Control Habilitado | Protección anti-cavitación: Activa"
-            binding.tvProteccionMotor.setTextColor("#546E7A".toColorInt())
+        val tramaFirmada = SecurityHelper.firmarJson(json)
+        BluetoothManagerHelper.enviarDatos(tramaFirmada)
+        binding.tvLogSerial.text = "TX_HMAC >> $json"
+
+        if (ultimaBombaRegistrada != bomba) {
+            val evento = if (bomba) "BOMBA_ACTIVADA_SIMULACION" else "BOMBA_DESACTIVADA_SIMULACION"
+            registrarEventoLocal(evento)
+            ultimaBombaRegistrada = bomba
         }
     }
 
+    private fun aplicarSeguridadNodoPlanta() {
+        binding.switchReleBomba.isEnabled = true
+        binding.tvProteccionMotor.text =
+            if (rolUsuario == "EMPRESA") "Control habilitado | Administrador" else "Control habilitado | Operador"
+        binding.tvProteccionMotor.setTextColor("#546E7A".toColorInt())
+    }
+
     private fun actualizarTelemetriaPlanta(distanciaCm: Float) {
-        binding.tvDistanciaSlider.text = "%.1f cm".format(distanciaCm)
+        binding.tvDistanciaSlider.text = String.format(Locale.US, "%.1f cm", distanciaCm)
         val porcentajeAgua = ((60.0f - distanciaCm) / 60.0f * 100.0f).coerceIn(0.0f, 100.0f)
         binding.progressNivelAgua.progress = porcentajeAgua.toInt()
-        binding.tvPorcentajePlanta.text = "Volumen: %.1f %%".format(porcentajeAgua)
+        binding.tvPorcentajePlanta.text = String.format(Locale.US, "Volumen: %.1f %%", porcentajeAgua)
 
         if (distanciaCm > 25.0f) {
             binding.tvAlertaNivelPlanta.text = "CRÍTICO (> 25 cm)"
@@ -107,12 +167,23 @@ class ActivadorActivity : AppCompatActivity() {
         }
     }
 
-    private fun actualizarConsolaSerial(distancia: Float, bombaActiva: Boolean) {
-        binding.tvLogSerial.text = "TX_BT >> {dist: %.1f, pump: %b}".format(distancia, bombaActiva)
+    private fun registrarEventoLocal(evento: String) {
+        dbHelper.registrarEvento(
+            distancia = binding.sliderDistancia.value,
+            bombaActiva = binding.switchReleBomba.isChecked,
+            evento = evento,
+            usuario = usuarioActual,
+            sesionId = sesionId.takeIf { it > 0 }
+        )
     }
 
     override fun onDestroy() {
+        if (isFinishing) {
+            registrarEventoLocal("FIN_SESION")
+            if (sesionId > 0) dbHelper.cerrarSesion(sesionId)
+            BluetoothManagerHelper.cerrarConexion()
+            dbHelper.close()
+        }
         super.onDestroy()
-        BluetoothManagerHelper.cerrarConexion()
     }
 }

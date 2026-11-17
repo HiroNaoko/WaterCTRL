@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Planta Virtual: Gemelo Digital"
+            android:text="@string/activador_titulo"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#0D47A1" />
@@ -24,7 +24,7 @@
             android:id="@+id/tvEstadoBTActivador"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estado BT: Escuchando conexiones..."
+            android:text="@string/activador_estado_bt_inicial"
             android:textSize="14sp"
             android:textColor="#546E7A"
             android:layout_marginBottom="16dp" />
@@ -55,7 +55,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Sensor Ultrasónico HC-SR04"
+                        android:text="@string/activador_sensor_titulo"
                         android:textStyle="bold"
                         android:textSize="17sp"
                         android:textColor="#263238" />
@@ -64,7 +64,7 @@
                         android:id="@+id/tvDistanciaSlider"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="28.0 cm"
+                        android:text="@string/activador_distancia_inicial"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         android:textColor="#0277BD" />
@@ -89,14 +89,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="0 cm (Lleno)"
+                        android:text="@string/activador_slider_min"
                         android:textSize="13sp"
                         android:textColor="#78909C" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="60 cm (Vacío)"
+                        android:text="@string/activador_slider_max"
                         android:textSize="13sp"
                         android:textColor="#78909C" />
                 </LinearLayout>
@@ -122,7 +122,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Columna de Agua Útil"
+                    android:text="@string/activador_columna_titulo"
                     android:textStyle="bold"
                     android:textSize="17sp"
                     android:textColor="#263238" />
@@ -149,7 +149,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Volumen: 53.3 %"
+                        android:text="@string/activador_volumen_inicial"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#37474F" />
@@ -158,7 +158,7 @@
                         android:id="@+id/tvAlertaNivelPlanta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="CRÍTICO (> 25 cm)"
+                        android:text="@string/activador_alerta_inicial"
                         android:textColor="#D32F2F"
                         android:textStyle="bold"
                         android:textSize="15sp" />
@@ -185,7 +185,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Actuador de Potencia"
+                    android:text="@string/activador_actuador_titulo"
                     android:textStyle="bold"
                     android:textSize="17sp"
                     android:textColor="#263238" />
@@ -194,7 +194,7 @@
                     android:id="@+id/switchReleBomba"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Motobomba de Llenado"
+                    android:text="@string/activador_switch_bomba"
                     android:textSize="16sp"
                     android:layout_marginTop="10dp" />
 
@@ -202,7 +202,7 @@
                     android:id="@+id/tvProteccionMotor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Protección anti-cavitación: Activa"
+                    android:text="@string/activador_proteccion_motor"
                     android:textSize="13sp"
                     android:textColor="#546E7A"
                     android:layout_marginTop="6dp" />
@@ -226,7 +226,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Monitor Serial RFCOMM (SPP)"
+                    android:text="@string/activador_consola_titulo"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:textColor="#80CBC4" />
@@ -235,7 +235,7 @@
                     android:id="@+id/tvLogSerial"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TX >> {dist: 28.0, pump: false, mode: AUTO}\nRX &lt;&lt; ESPERANDO ENLACE SCADA..."
+                    android:text="@string/activador_log_inicial"
                     android:fontFamily="monospace"
                     android:textSize="12sp"
                     android:textColor="#ECEFF1"

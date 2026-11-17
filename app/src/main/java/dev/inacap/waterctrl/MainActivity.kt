@@ -1,3 +1,4 @@
+
 package dev.inacap.waterctrl
 
 import android.content.Intent
@@ -14,40 +15,76 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar el gestor de SQLite local
+        // Inicializar SQLite.
         dbHelper = DatabaseHelper(this)
 
         binding.btnIngresar.setOnClickListener {
+
             val usuario = binding.etUsuario.text.toString().trim()
             val contrasena = binding.etClave.text.toString().trim()
 
             if (usuario.isEmpty() || contrasena.isEmpty()) {
-                Toast.makeText(this, "Por favor ingrese usuario y contraseña", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Por favor ingrese usuario y contraseña",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 return@setOnClickListener
             }
 
-            // Consulta directa a la base de datos SQLite local
-            val rolDetectado = dbHelper.validarCredenciales(usuario, contrasena)
+            // Validar credenciales.
+            val rolDetectado = dbHelper.validarCredenciales(
+                usuario,
+                contrasena
+            )
 
             if (rolDetectado != null) {
-                // Registro de auditoría local: Login exitoso
+
+                // Crear una nueva sesión.
+                val sesionId = dbHelper.iniciarSesion(usuario)
+
+                if (sesionId == -1L) {
+                    Toast.makeText(
+                        this,
+                        "No se pudo registrar la sesión",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@setOnClickListener
+                }
+
+                // Registrar el inicio de sesión en la bitácora.
                 dbHelper.registrarEvento(
                     distancia = 0.0f,
                     bombaActiva = false,
                     evento = "INICIO_SESION_EXITOSO",
-                    usuario = usuario
+                    usuario = usuario,
+                    sesionId = sesionId
                 )
-                abrirSelectorDeRol(rolDetectado)
+
+                abrirSelectorDeRol(rolDetectado, usuario, sesionId)
+
             } else {
-                Toast.makeText(this, "Credenciales incorrectas en la base local", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Credenciales incorrectas en la base local",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    private fun abrirSelectorDeRol(rol: String) {
+    private fun abrirSelectorDeRol(
+        rol: String,
+        usuario: String,
+        sesionId: Long
+    ) {
+
         val opciones = arrayOf(
             "Nodo Planta (Activador / Gemelo Digital)",
             "Consola SCADA (Monitoreo OT)"
@@ -56,17 +93,41 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Selecciona interfaz a probar ($rol)")
             .setItems(opciones) { _, which ->
-                if (which == 0) {
-                    val intent = Intent(this, ActivadorActivity::class.java)
-                    intent.putExtra("ROL_USUARIO", rol)
-                    startActivity(intent)
+
+                val intent = if (which == 0) {
+                    Intent(this, ActivadorActivity::class.java)
                 } else {
-                    val intent = Intent(this, MonitoreoActivity::class.java)
-                    intent.putExtra("ROL_USUARIO", rol)
-                    startActivity(intent)
+                    Intent(this, MonitoreoActivity::class.java)
                 }
+
+                // Enviar los datos de autenticación y sesión.
+                intent.putExtra("ROL_USUARIO", rol)
+                intent.putExtra("USUARIO", usuario)
+                intent.putExtra("SESION_ID", sesionId)
+
+                startActivity(intent)
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton("Cancelar") { _, _ ->
+
+                // Si cancela la selección, cerrar la sesión creada.
+                dbHelper.cerrarSesion(sesionId)
+
+                dbHelper.registrarEvento(
+                    distancia = 0.0f,
+                    bombaActiva = false,
+                    evento = "SELECCION_INTERFAZ_CANCELADA",
+                    usuario = usuario,
+                    sesionId = sesionId
+                )
+            }
             .show()
+    }
+
+    override fun onDestroy() {
+        if (::dbHelper.isInitialized) {
+            dbHelper.close()
+        }
+
+        super.onDestroy()
     }
 }
