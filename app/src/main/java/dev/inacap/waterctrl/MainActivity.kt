@@ -1,4 +1,3 @@
-
 package dev.inacap.waterctrl
 
 import android.content.Intent

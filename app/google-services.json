@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "223422566951",
+    "firebase_url": "https://waterctrl-8ab94-default-rtdb.firebaseio.com",
     "project_id": "waterctrl-8ab94",
     "storage_bucket": "waterctrl-8ab94.firebasestorage.app"
   },

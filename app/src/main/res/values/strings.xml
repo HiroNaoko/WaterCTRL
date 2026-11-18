@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">WaterCTRL</string>
 
     <!-- MonitoreoActivity -->
@@ -27,12 +29,12 @@
     <string name="activador_slider_max">60 cm (Vacío)</string>
     <string name="activador_columna_titulo">Columna de Agua Útil</string>
     <string name="activador_volumen_inicial" formatted="false">Volumen: 53.3 %</string>
-    <string name="activador_alerta_inicial">CRÍTICO (&gt; 25 cm)</string>
+    <string name="activador_alerta_inicial">CRÍTICO (\u003e 25 cm)</string>
     <string name="activador_actuador_titulo">Actuador de Potencia</string>
     <string name="activador_switch_bomba">Motobomba de Llenado</string>
     <string name="activador_proteccion_motor">Protección anti-cavitación: Activa</string>
     <string name="activador_consola_titulo">Monitor Serial RFCOMM (SPP)</string>
-    <string name="activador_log_inicial">TX &gt;&gt; {dist: 28.0, pump: false, mode: AUTO}\nRX &lt;&lt; ESPERANDO ENLACE SCADA…</string>
+    <string name="activador_log_inicial">TX \u003e\u003e {dist: 28.0, pump: false, mode: AUTO}\nRX \u003c\u003c ESPERANDO ENLACE SCADA…</string>
 
     <!-- Historial -->
     <string name="historial_volver">VOLVER</string>
@@ -67,7 +69,6 @@
     <string name="historial_rango_dia">Por día</string>
     <string name="historial_filtro_sesiones_corto">Sesiones</string>
 
-
     <!-- Pantalla SCADA -->
     <string name="scada_titulo">Consola SCADA: Monitoreo OT</string>
     <string name="scada_estado_bt">Enlace BT: Conectando…</string>
@@ -86,15 +87,16 @@
 
     <string name="scada_estado_estop">PARO DE EMERGENCIA ACTIVO</string>
     <string name="scada_estado_falla_sensor">FALLA DE SENSOR HC-SR04</string>
-    <string name="scada_estado_critico">NIVEL CRÍTICO (> 25 cm) - LLENANDO</string>
+    <string name="scada_estado_critico">NIVEL CRÍTICO (\u003e 25 cm) - LLENANDO</string>
     <string name="historial_operador_sesion">%1$s · Ses #%2$d</string>
     <string name="scada_estado_lleno">ESTANQUE LLENO (\u003c 8 cm) - DETENIDO</string>
     <string name="historial_grafico_titulo">TENDENCIA DE NIVEL DE AGUA (ÚLTIMOS 12 EVENTOS)</string>
+
     <!-- Eficiencia Energética SCADA -->
     <string name="scada_energia_titulo">Eficiencia Energética (IoT + Actuador)</string>
-    <string name="scada_switch_eco">Modo Ahorro Energético (ECO - 2500 ms)</string>
-    <string name="scada_energia_telemetria_normal">Muestreo: Normal (500 ms · 2.0 Hz)</string>
-    <string name="scada_energia_telemetria_eco">Muestreo: ECO (2500 ms · 0.4 Hz · -80%% TX)</string>
+    <string name="scada_switch_eco">Modo Ahorro Energético (ECO - 3500 ms)</string>
+    <string name="scada_energia_telemetria_normal">Muestreo: Normal (1000 ms · 1.0 Hz)</string>
+    <string name="scada_energia_telemetria_eco">Muestreo: ECO (3500 ms · 0.29 Hz · -71%% TX)</string>
     <string name="scada_energia_consumo_inicial">Bomba: 0.00 Wh  |  Ahorro IoT: 0.00 mWh</string>
     <string name="scada_energia_consumo_formato">Bomba: %1$.2f Wh  |  Ahorro IoT: %2$.2f mWh</string>
 

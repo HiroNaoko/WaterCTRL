@@ -45,7 +45,7 @@ class MonitoreoActivity : AppCompatActivity() {
     private var energiaBombaWh = 0.0
     private var energiaAhorradaIoTmWh = 0.0
     private val potenciaBombaWatts = 370.0
-    private val ahorroNodoEcoMilliWatts = 145.0
+    private val ahorroNodoEcoMilliWatts = 100.0
 
     private val handlerEnergia = Handler(Looper.getMainLooper())
     private val runnableEnergia = object : Runnable {
